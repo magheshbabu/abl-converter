@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.ibsplc.msc.ablconverter.array.data.TableFieldHolder;
 import com.ibsplc.msc.ablconverter.core.TableAndField;
 
-public class ExtendConverter extends BaseConverter {
+public class LikeSynonymConvertor extends BaseConverter {
 
 	@Autowired
 	TableFieldHolder fieldHolder;
@@ -21,12 +21,10 @@ public class ExtendConverter extends BaseConverter {
 
 		ListIterator<TableAndField> itr = fieldHolder.getTableAndField().listIterator();
 
-		if (replacedLine.toUpperCase().indexOf("EXTENT") != -1) {
+		if (replacedLine.toUpperCase().indexOf("LIKE") != -1) {
 			while (itr.hasNext()) {
 				TableAndField tf = (TableAndField) itr.next();
-				String strToFind = "(?i)(\\bextent\\b)(\\s*)(\\()(\\s*)(\\b"
-						+ tf.getTableName() + "\\s*\\.\\s*" + tf.getFieldName()
-						+ "\\b)\\s*(\\))";
+				String strToFind = "(?i)(define|def)(.*?)(variable|var)(.*?)(like)(.*?)(\\b" + tf.getTableName() + "\\s*\\.\\s*" + tf.getFieldName() + "\\b)";
 				
 
 				Matcher m = Pattern.compile(strToFind).matcher(lineToProcess);
@@ -40,8 +38,8 @@ public class ExtendConverter extends BaseConverter {
 	}
 	
 	private String doReplace(String lineToProcess, TableAndField tf) {
-		String strToFind = "(?i)(\\bextent\\b)(\\s*)(\\()(\\s*)(\\b" + tf.getTableName() + "\\s*\\.\\s*" + tf.getFieldName() + "\\b)\\s*(\\))";
-		String strToReplace =  "NUM-ENTRIES\\($5,\";\"\\)";
+		String strToFind = "(?i)(define|def)(.*?)(variable|var)(.*?)(like)(.*?)(\\b" + tf.getTableName() + "\\s*\\.\\s*" + tf.getFieldName() + "\\b)";
+		String strToReplace =  "$1$2$3$4  as inte extent " + tf.getFieldArraySize();
 		lineToProcess = lineToProcess.replaceAll(strToFind, strToReplace);
 		return lineToProcess;
 		
